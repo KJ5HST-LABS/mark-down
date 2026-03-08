@@ -48,9 +48,8 @@ cp "$EXT_SRC/Info.plist" "$BUILD_DIR/Contents/Info.plist"
 # Write PkgInfo
 echo -n "XPC!" > "$BUILD_DIR/Contents/PkgInfo"
 
-# Sign the extension
-IDENTITY="${APPLE_SIGNING_IDENTITY:-"-"}"
-codesign --force --sign "$IDENTITY" \
+# Ad-hoc sign the extension (Tauri re-signs the full app bundle with the real identity)
+codesign --force --sign - \
     --entitlements "$EXT_SRC/extension.entitlements" \
     "$BUILD_DIR"
 
