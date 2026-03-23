@@ -268,19 +268,21 @@ pub fn run() {
         .run(|app_handle, event| {
             if let tauri::RunEvent::Opened { urls } = event {
                 for url in urls {
-                    let path_string = url
-                        .to_file_path()
-                        .ok()
-                        .and_then(|p| p.to_str().map(String::from));
-                    if let Some(path_str) = path_string {
-                        // Try to emit directly to the frontend
-                        if let Some(window) = app_handle.get_webview_window("main") {
-                            let _ = window.emit("file-open", &path_str);
-                        }
-                        // Also store in state so the frontend can retrieve it on init
-                        if let Some(state) = app_handle.try_state::<PendingFile>() {
-                            *state.0.lock().unwrap() = Some(path_str);
-                        }
+                    let path: PathBuf = match url.to_file_path() {
+                        Ok(p) => p,
+                        Err(_) => continue,
+                    };
+                    let path_str = match path.to_str() {
+                        Some(s) => s.to_string(),
+                        None => continue,
+                    };
+                    // Try to emit directly to the frontend
+                    if let Some(window) = app_handle.get_webview_window("main") {
+                        let _ = window.emit("file-open", &path_str);
+                    }
+                    // Also store in state so the frontend can retrieve it on init
+                    if let Some(state) = app_handle.try_state::<PendingFile>() {
+                        *state.0.lock().unwrap() = Some(path_str);
                     }
                 }
             }
