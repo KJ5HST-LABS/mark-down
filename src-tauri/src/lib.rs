@@ -129,6 +129,17 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .manage(PendingFile(Mutex::new(None)))
         .setup(|app| {
+            // Check if a file path was passed as a CLI argument (e.g. binary invoked directly)
+            let args: Vec<String> = std::env::args().collect();
+            if args.len() > 1 {
+                let path = PathBuf::from(&args[1]);
+                if path.exists() && path.is_file() {
+                    if let Some(state) = app.try_state::<PendingFile>() {
+                        *state.0.lock().unwrap() = Some(args[1].clone());
+                    }
+                }
+            }
+
             // File menu
             let new_file = MenuItemBuilder::with_id("new", "New")
                 .accelerator("CmdOrCtrl+N")

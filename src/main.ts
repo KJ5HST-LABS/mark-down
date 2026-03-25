@@ -405,13 +405,18 @@ async function init() {
 
   setupToolbar();
   setupDivider();
-  setupMenuEvents();
+  await setupMenuEvents();
   applyView("hsplit");
 
   // Check if the app was launched by opening a file (double-click / Open With)
-  const pendingFile = await invoke<string | null>("take_pending_file");
-  if (pendingFile) {
-    await handleFileOpen(pendingFile);
+  // Retry a few times since the macOS Apple Event may arrive after the webview loads
+  for (let i = 0; i < 5; i++) {
+    const pendingFile = await invoke<string | null>("take_pending_file");
+    if (pendingFile) {
+      await handleFileOpen(pendingFile);
+      break;
+    }
+    await new Promise((r) => setTimeout(r, 200));
   }
 }
 
