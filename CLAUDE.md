@@ -89,6 +89,14 @@ bash scripts/build-quicklook.sh
 bash scripts/patch-plist.sh "path/to/Mark Down.app"
 ```
 
+## Backlog & Issues
+
+Use **GitHub Issues** for backlog items, bugs, and cross-project coordination. Do not use BACKLOG.md — it has been migrated to GitHub Issues.
+
+- View issues: `gh issue list`
+- Create issue: `gh issue create --title "..." --body "..."`
+- Cross-project issues: use the target repo's issue tracker
+
 ## Conventions
 
 - View modes: editor, hsplit, vsplit, preview (stored as `ViewMode` type)
